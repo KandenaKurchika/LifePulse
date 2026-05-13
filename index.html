@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LifePulse — Daily Life Tracker</title>
+  <meta name="description" content="Track your daily habits, visualize progress with beautiful charts, and get smart insights to improve your life.">
+  <meta name="theme-color" content="#6366f1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+</head>
+<body>
+
+  <!-- Mobile Toggle -->
+  <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle menu">☰</button>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">📊</div>
+      <h2>LifePulse</h2>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" data-page="dashboard" id="nav-dashboard">
+        <span class="icon">🏠</span><span>Dashboard</span>
+      </div>
+      <div class="nav-item" data-page="log" id="nav-log">
+        <span class="icon">✏️</span><span>Daily Log</span>
+      </div>
+      <div class="nav-item" data-page="analytics" id="nav-analytics">
+        <span class="icon">📈</span><span>Analytics</span>
+      </div>
+      <div class="nav-item" data-page="insights" id="nav-insights">
+        <span class="icon">💡</span><span>Insights</span>
+      </div>
+      <div class="nav-item" data-page="settings" id="nav-settings">
+        <span class="icon">⚙️</span><span>Settings</span>
+      </div>
+    </nav>
+    <div style="padding: 12px; border-top: 1px solid var(--border-glass); margin-top: auto;">
+      <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
+        <span id="theme-icon">🌙</span>
+        <span id="theme-label">Dark Mode</span>
+        <div class="toggle-track"><div class="toggle-thumb"></div></div>
+      </div>
+      <div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 8px;">LifePulse v1.0</div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- ═══════════ DASHBOARD ═══════════ -->
+    <section class="page-section active" id="page-dashboard">
+      <div class="page-header">
+        <h1>👋 Good <span id="greeting-time">Morning</span>!</h1>
+        <p id="today-date-display">Loading...</p>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="stats-grid">
+        <div class="stat-card purple">
+          <div class="stat-icon">🔥</div>
+          <div class="stat-value" id="stat-streak">0</div>
+          <div class="stat-label">Day Streak</div>
+        </div>
+        <div class="stat-card teal">
+          <div class="stat-icon">📅</div>
+          <div class="stat-value" id="stat-total-days">0</div>
+          <div class="stat-label">Days Tracked</div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon">😊</div>
+          <div class="stat-value" id="stat-avg-mood">—</div>
+          <div class="stat-label">Avg Mood</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-icon">🏆</div>
+          <div class="stat-value" id="stat-best-streak">0</div>
+          <div class="stat-label">Best Streak</div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Today's Summary -->
+        <div class="card">
+          <div class="card-header">
+            <h3>📋 Today's Summary</h3>
+            <button class="btn btn-sm btn-primary" onclick="navigateTo('log')">+ Log Today</button>
+          </div>
+          <div class="today-mini-grid" id="today-summary">
+            <div class="today-mini"><div class="mini-emoji">🏋️</div><div class="mini-val" id="ts-fitness">—</div><div class="mini-label">Fitness</div></div>
+            <div class="today-mini"><div class="mini-emoji">📚</div><div class="mini-val" id="ts-study">—</div><div class="mini-label">Study</div></div>
+            <div class="today-mini"><div class="mini-emoji">💼</div><div class="mini-val" id="ts-work">—</div><div class="mini-label">Work</div></div>
+            <div class="today-mini"><div class="mini-emoji">😴</div><div class="mini-val" id="ts-sleep">—</div><div class="mini-label">Sleep</div></div>
+            <div class="today-mini"><div class="mini-emoji">💧</div><div class="mini-val" id="ts-water">—</div><div class="mini-label">Water</div></div>
+            <div class="today-mini"><div class="mini-emoji">😊</div><div class="mini-val" id="ts-mood">—</div><div class="mini-label">Mood</div></div>
+          </div>
+        </div>
+
+        <!-- Streak & Quote -->
+        <div>
+          <div class="streak-display" style="margin-bottom: 20px;">
+            <div class="streak-fire">🔥</div>
+            <div>
+              <div class="streak-count" id="streak-display-count">0 days</div>
+              <div class="streak-label">Current streak — keep going!</div>
+            </div>
+          </div>
+          <div class="quote-card">
+            <div class="quote-mark">"</div>
+            <div class="quote-text" id="quote-text">The secret of getting ahead is getting started.</div>
+            <div class="quote-author" id="quote-author">— Mark Twain</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Calendar Heatmap -->
+      <div class="card" style="margin-bottom: 24px;">
+        <div class="card-header">
+          <h3>📅 Activity Heatmap</h3>
+          <span style="color: var(--text-muted); font-size: 0.8rem;" id="heatmap-summary"></span>
+        </div>
+        <div class="heatmap-container" id="heatmap-container"></div>
+        <div id="heatmap-tooltip-el" class="heatmap-tooltip"></div>
+      </div>
+
+      <!-- Mini Chart -->
+      <div class="card">
+        <div class="card-header">
+          <h3>📊 Last 7 Days Overview</h3>
+        </div>
+        <div class="chart-container">
+          <canvas id="dashboardChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ DAILY LOG ═══════════ -->
+    <section class="page-section" id="page-log">
+      <div class="page-header">
+        <h1>✏️ Daily Log</h1>
+        <p>Record your day — every entry counts!</p>
+      </div>
+
+      <!-- Date Picker -->
+      <div class="card" style="margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+          <label style="font-weight: 600;">📅 Date:</label>
+          <input type="date" id="log-date" style="max-width: 200px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-glass); border-radius: var(--radius-sm); padding: 10px 16px; color: var(--text-primary); font-family: 'Inter'; outline: none;">
+          <button class="btn btn-sm btn-secondary" onclick="setLogDateToday()">Today</button>
+          <span id="log-date-label" style="color: var(--text-secondary); font-size: 0.9rem;"></span>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <!-- Fitness -->
+        <div class="input-group">
+          <label><span class="emoji">🏋️</span> Fitness (minutes)</label>
+          <div class="range-container">
+            <div class="range-value" id="fitness-val">0</div>
+            <input type="range" id="log-fitness" min="0" max="180" value="0" oninput="updateRangeVal('fitness')">
+          </div>
+        </div>
+        <!-- Study -->
+        <div class="input-group">
+          <label><span class="emoji">📚</span> Study (hours)</label>
+          <div class="range-container">
+            <div class="range-value" id="study-val">0</div>
+            <input type="range" id="log-study" min="0" max="16" step="0.5" value="0" oninput="updateRangeVal('study')">
+          </div>
+        </div>
+        <!-- Work -->
+        <div class="input-group">
+          <label><span class="emoji">💼</span> Work (hours)</label>
+          <div class="range-container">
+            <div class="range-value" id="work-val">0</div>
+            <input type="range" id="log-work" min="0" max="16" step="0.5" value="0" oninput="updateRangeVal('work')">
+          </div>
+        </div>
+        <!-- Sleep -->
+        <div class="input-group">
+          <label><span class="emoji">😴</span> Sleep (hours)</label>
+          <div class="range-container">
+            <div class="range-value" id="sleep-val">0</div>
+            <input type="range" id="log-sleep" min="0" max="14" step="0.5" value="0" oninput="updateRangeVal('sleep')">
+          </div>
+        </div>
+        <!-- Water -->
+        <div class="input-group">
+          <label><span class="emoji">💧</span> Water (glasses)</label>
+          <div class="range-container">
+            <div class="range-value" id="water-val">0</div>
+            <input type="range" id="log-water" min="0" max="20" value="0" oninput="updateRangeVal('water')">
+          </div>
+        </div>
+        <!-- Mood -->
+        <div class="input-group">
+          <label><span class="emoji">😊</span> Mood</label>
+          <div class="mood-selector" id="mood-selector">
+            <button class="mood-btn" data-mood="1" onclick="selectMood(1)">😞</button>
+            <button class="mood-btn" data-mood="2" onclick="selectMood(2)">😔</button>
+            <button class="mood-btn" data-mood="3" onclick="selectMood(3)">😐</button>
+            <button class="mood-btn" data-mood="4" onclick="selectMood(4)">😊</button>
+            <button class="mood-btn" data-mood="5" onclick="selectMood(5)">😄</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Habits -->
+      <div class="card" style="margin-top: 24px;">
+        <div class="card-header">
+          <h3>✅ Daily Habits</h3>
+        </div>
+        <div class="habit-list" id="habit-list"></div>
+      </div>
+
+      <!-- Notes -->
+      <div class="card" style="margin-top: 24px;">
+        <div class="card-header"><h3>📝 Notes</h3></div>
+        <textarea id="log-notes" placeholder="How was your day? Any thoughts or reflections..." style="width:100%;background:rgba(0,0,0,0.3);border:1px solid var(--border-glass);border-radius:var(--radius-sm);padding:14px;color:var(--text-primary);font-family:'Inter';font-size:0.95rem;outline:none;resize:vertical;min-height:100px;"></textarea>
+      </div>
+
+      <!-- Save -->
+      <div style="margin-top: 24px; display: flex; gap: 12px;">
+        <button class="btn btn-primary" id="save-log-btn" onclick="saveLog()">💾 Save Entry</button>
+        <button class="btn btn-secondary" onclick="clearLogForm()">🗑️ Clear</button>
+      </div>
+    </section>
+
+    <!-- ═══════════ ANALYTICS ═══════════ -->
+    <section class="page-section" id="page-analytics">
+      <div class="page-header">
+        <h1>📈 Analytics</h1>
+        <p>Visualize your progress and discover patterns</p>
+      </div>
+
+      <div class="card" style="margin-bottom: 24px;">
+        <div class="card-header">
+          <h3>🕒 Time Range</h3>
+          <div class="time-range">
+            <button class="time-pill active" data-range="7" onclick="setTimeRange(7)">7 Days</button>
+            <button class="time-pill" data-range="30" onclick="setTimeRange(30)">30 Days</button>
+            <button class="time-pill" data-range="90" onclick="setTimeRange(90)">90 Days</button>
+            <button class="time-pill" data-range="all" onclick="setTimeRange('all')">All Time</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid-full">
+        <div class="card">
+          <div class="card-header"><h3>📉 Activity Trends</h3></div>
+          <div class="chart-container"><canvas id="trendChart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>📊 Daily Comparison</h3></div>
+          <div class="chart-container"><canvas id="barChart"></canvas></div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid-full" style="margin-top: 24px;">
+        <div class="card">
+          <div class="card-header"><h3>🍩 Time Distribution</h3></div>
+          <div class="chart-container" style="max-width: 350px; margin: 0 auto;"><canvas id="doughnutChart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>😊 Mood Timeline</h3></div>
+          <div class="chart-container"><canvas id="moodChart"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ INSIGHTS ═══════════ -->
+    <section class="page-section" id="page-insights">
+      <div class="page-header">
+        <h1>💡 Insights & Improvements</h1>
+        <p>Smart analysis of your habits with actionable suggestions</p>
+      </div>
+
+      <div class="dashboard-grid">
+        <div>
+          <!-- Pattern Analysis -->
+          <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header"><h3>🔍 Pattern Analysis</h3></div>
+            <div id="insights-list">
+              <p style="color: var(--text-muted); text-align: center; padding: 20px;">Log at least 3 days of data to see insights.</p>
+            </div>
+          </div>
+          <!-- Suggestions -->
+          <div class="card">
+            <div class="card-header"><h3>🎯 Improvement Suggestions</h3></div>
+            <div id="suggestions-list">
+              <p style="color: var(--text-muted); text-align: center; padding: 20px;">Suggestions will appear after a few days of tracking.</p>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <!-- Weekly Report -->
+          <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header"><h3>📋 Weekly Report</h3></div>
+            <div id="weekly-report">
+              <div class="report-grade">
+                <div class="grade-circle grade-C" id="report-grade">—</div>
+                <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 8px;">Track a full week to get graded!</p>
+              </div>
+            </div>
+          </div>
+          <!-- Achievements -->
+          <div class="card">
+            <div class="card-header"><h3>🏅 Achievements</h3></div>
+            <div class="achievements-grid" id="achievements-grid"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ SETTINGS ═══════════ -->
+    <section class="page-section" id="page-settings">
+      <div class="page-header">
+        <h1>⚙️ Settings</h1>
+        <p>Customize your tracking experience</p>
+      </div>
+
+      <!-- Goals -->
+      <div class="card settings-section">
+        <h3>🎯 Daily Goals</h3>
+        <div id="goals-list"></div>
+        <button class="btn btn-sm btn-primary" style="margin-top: 12px;" onclick="saveGoals()">Save Goals</button>
+      </div>
+
+      <!-- Custom Habits -->
+      <div class="card settings-section">
+        <h3>✅ Custom Habits</h3>
+        <div id="custom-habits-settings"></div>
+        <div style="display: flex; gap: 8px; margin-top: 12px;">
+          <input type="text" id="new-habit-input" placeholder="Add new habit..." style="flex:1;background:rgba(0,0,0,0.3);border:1px solid var(--border-glass);border-radius:var(--radius-sm);padding:10px 14px;color:var(--text-primary);font-family:'Inter';outline:none;">
+          <button class="btn btn-sm btn-primary" onclick="addCustomHabit()">+ Add</button>
+        </div>
+      </div>
+
+      <!-- Daily Reminder -->
+      <div class="card settings-section">
+        <h3>🔔 Daily Reminder</h3>
+        <div class="reminder-row">
+          <label style="font-weight: 500;">⏰ Remind me at:</label>
+          <input type="time" id="reminder-time" value="21:00">
+          <button class="btn btn-sm btn-primary" onclick="enableReminder()">Enable</button>
+          <button class="btn btn-sm btn-secondary" onclick="disableReminder()">Disable</button>
+        </div>
+        <div class="reminder-status" id="reminder-status" style="margin-top: 10px;">
+          <span class="dot off"></span> Reminder not set
+        </div>
+      </div>
+
+      <!-- Data Management -->
+      <div class="card settings-section">
+        <h3>💾 Data Management</h3>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <button class="btn btn-danger" onclick="clearAllData()">🗑️ Clear All Data</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="app.js"></script>
+  <script src="charts.js"></script>
+  <script src="insights.js"></script>
+</body>
+</html>
